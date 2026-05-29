@@ -17,14 +17,16 @@ exit_with_error() {
 
 # Validar que el contenidor està en execució
 echo -e "\e[33mVerificant contenidor $CONTAINER_NAME...\e[0m"
-sudo docker ps | grep -q "$CONTAINER_NAME" || exit_with_error "Contenidor $CONTAINER_NAME no està en execució. Executa: docker-compose up -d"
+if ! sudo docker ps --format '{{.Names}}' | grep -qx "$CONTAINER_NAME"; then
+    exit_with_error "Contenidor $CONTAINER_NAME no està en execució. Executa: docker-compose up -d"
+fi
 
 # Validar que el fitxer SQL existeix
 [ -f "$SQL_FILE" ] || exit_with_error "Fitxer $SQL_FILE no trobat"
 
 # ====== PAS 0: Netejar BD existent si existeix ======
-echo -e "\e[33mPas 0: Verificant si existeix BD anterior...\e[0m"
-if sudo docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d postgres -lqt | grep -q "$DB_NAME"; then
+DB_EXISTS=$(sudo docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'")
+if [ "$DB_EXISTS" = "1" ]; then
     echo -e "\e[33mBD $DB_NAME ja existeix. Eliminant...\e[0m"
     if sudo docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d postgres -c "DROP DATABASE IF EXISTS $DB_NAME;" 2>/dev/null; then
         echo -e "\e[32mBD anterior eliminada\e[0m"
@@ -55,7 +57,7 @@ echo -e "\e[32mRestauració completada en ${restore_time}s\e[0m"
 
 # Verificar que la BD té dades
 echo -e "\e[33mVerificant que la BD s'ha restaurat correctament...\e[0m"
-table_count=$(docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d "$DB_NAME" -c \
+table_count=$(sudo docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d "$DB_NAME" -c \
     "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema NOT IN ('pg_catalog','information_schema');" 2>&1)
 echo -e "\e[32mTaules trobades: $table_count\e[0m"
 
