@@ -77,8 +77,13 @@ echo ""
 # ====== PAS 4: Executar procés batch ======
 echo -e "\e[36mPas 4: Executant procés batch...\e[0m"
 batch_start=$(date +%s)
-sudo docker compose --profile tools run --rm process-reference \
-    || exit_with_error "Error en el procés batch"
+if docker compose version >/dev/null 2>&1; then
+    sudo docker compose --profile tools run --rm process-reference \
+        || exit_with_error "Error en el procés batch"
+else
+    sudo docker-compose --profile tools run --rm process-reference \
+        || exit_with_error "Error en el procés batch"
+fi
 batch_end=$(date +%s)
 batch_time=$((batch_end - batch_start))
 echo -e "\e[32mProcés batch completat en ${batch_time}s\e[0m"
