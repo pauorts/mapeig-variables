@@ -1,0 +1,77 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: postgres-tool
+    restart: always
+    env_file:
+      - .env                         # ← yes, perfectly valid here
+    environment:                     # these override .env if the same key appears in both
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${BBDD_uci}
+    ports:
+      - "5454:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:                     # ← backend now waits for postgres to be truly ready
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${BBDD_uci}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fastapi-tool
+    restart: always 
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    
+  nginx:
+    image: nginx:1.26.2-alpine
+    container_name: nginx-tool
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "1077:80" # El puerto 80 del servidor queda abierto para la red del hospital
+    volumes:
+      # Montamos el archivo de configuración que vamos a crear en el paso 2
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      # Montamos TU carpeta de estáticos en Nginx (ajusta la ruta "./app/static" si la tuya es diferente)
+      - ./app/static:/usr/share/nginx/html/static:ro
+    networks:
+      - default
+
+  process-reference:
+    build:
+      context: .
+      dockerfile: Dockerfile.batch    # heavy image, only built when needed
+    container_name: process-reference-uci
+    profiles:
+      - tools                         # excluded from normal docker compose up/down
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - huggingface_cache:/root/.cache/huggingface
+      # Mount the ZIP archive with openEHR archetypes.
+      # Adjust the host path if the file lives elsewhere.
+      - ./archetypes_2026_01_29-15_34_10.zip:/app/archetypes_2026_01_29-15_34_10.zip
+    env_file:
+      - .env
+    restart: "no"                     # one-shot — exits when the script finishes
+    command: ["python", "-m", "app.cron.build_reference"]
+
+volumes:
+  postgres_data:
+  huggingface_cache: 

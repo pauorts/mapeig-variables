@@ -1,0 +1,55 @@
+FROM python:3.11-slim-bullseye
+
+USER root
+
+# Dependencias de sistema mínimas para compilar paquetes Python con extensiones C
+# (psycopg2, FAISS, numpy, etc.). Sin Oracle, Java, FreeTDS ni ODBC:
+# build_reference.py solo lee Excel + ZIP archetypes y escribe en PostgreSQL.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        g++ \
+        build-essential \
+        libpq-dev \
+        python3-dev \
+        libssl-dev \
+        curl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# HuggingFace cache persistente (montado como volumen en docker-compose)
+ENV TRANSFORMERS_CACHE=/root/.cache/huggingface
+ENV HF_HOME=/root/.cache/huggingface
+RUN mkdir -p /root/.cache/huggingface
+
+# ── Python: deps base (psycopg2, pandas, sqlalchemy, openpyxl…) ──────────────
+# Capa separada para que cambios en requirements.batch.txt no invaliden esta.
+COPY ./requirements.txt /requirements.txt
+RUN pip install --upgrade "pip>=23.2" && \
+    pip install --no-cache-dir -r /requirements.txt
+
+# ── Python: stack ML pesado ───────────────────────────────────────────────────
+# torch y tensorflow en capa propia: ~1.4 GB, raro que cambien de versión.
+COPY ./requirements.batch.txt /requirements.batch.txt
+RUN pip install --no-cache-dir \
+        torch==2.0.1 \
+        tensorflow==2.12.0 \
+        faiss-cpu==1.7.4 && \
+    pip install --no-cache-dir -r /requirements.batch.txt
+
+# ── Modelo SapBERT horneado en la imagen (~430 MB) ───────────────────────────
+# Evita descargarlo en cada ejecución. Si prefieres cachearlo en volumen,
+# comenta este bloque y monta el volumen huggingface_cache en docker-compose.
+RUN python -c "\
+from sentence_transformers import SentenceTransformer; \
+SentenceTransformer('cambridgeltl/SapBERT-from-PubMedBERT-fulltext'); \
+print('SapBERT listo.')"
+
+# ── Código de la aplicación ───────────────────────────────────────────────────
+RUN mkdir -p /app
+WORKDIR /app
+COPY . /app
+ENV PYTHONPATH=/app
+
+# ── Comando por defecto ───────────────────────────────────────────────────────
+# Sobreescribible desde docker-compose: command: ["python", "-m", "..."]
+CMD ["python", "-m", "app.cron.build_reference"]

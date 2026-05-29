@@ -1,0 +1,205 @@
+{% extends "GENERAL/base.html" %}
+
+{% block title %}Cobertura de Mapejos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='style/css/view_maps.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<!-- ── HERO: progress + stats (scrollable) ─────────────────────────────── -->
+<div class="vm-hero">
+  <div class="vm-hero-inner">
+
+    <div class="vm-hero-title-row">
+      <a href="/select/" class="vm-back-btn" title="Tornar">
+        <i class="fa fa-arrow-left"></i>
+      </a>
+      <div>
+        <h1 class="vm-page-title">Cobertura de Mapejos</h1>
+        <p class="vm-page-sub">Catàleg SOCMIC · Variables UCI de referència</p>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="vm-progress-wrap">
+      <div class="vm-progress-top">
+        <span class="vm-progress-label" id="progressLabel">Carregant...</span>
+        <span class="vm-progress-pct" id="progressPct">—</span>
+      </div>
+      <div class="vm-progress-track">
+        <div class="vm-progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <div class="vm-progress-caption" id="progressCaption"></div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="vm-stats-row">
+      <div class="vm-stat-box">
+        <div class="vm-stat-n" id="statTotal">—</div>
+        <div class="vm-stat-l">Variables referència</div>
+      </div>
+      <div class="vm-stat-box vm-stat-ok">
+        <div class="vm-stat-n" id="statMapped">—</div>
+        <div class="vm-stat-l">Mapejades</div>
+      </div>
+      <div class="vm-stat-box vm-stat-ko">
+        <div class="vm-stat-n" id="statUnmapped">—</div>
+        <div class="vm-stat-l">Sense mapejar</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── CONTROLS: sticky ────────────────────────────────────────────────── -->
+<div class="vm-controls" id="vmControls">
+  <div class="vm-controls-inner">
+
+    <!-- Category pills -->
+    <div class="vm-cat-row" id="categoryFilters">
+      <div class="vm-cat-skeleton"></div>
+    </div>
+
+    <!-- Toolbar: filters + search + export -->
+    <div class="vm-toolbar">
+
+      <!-- Mapped filter (shown when a group/search is active) -->
+      <div class="vm-mapped-filter" id="mappedFilter" style="display:none">
+        <button class="vm-mf-btn active" data-val="" onclick="onMappedFilter('', this)">
+          Totes
+        </button>
+        <button class="vm-mf-btn vm-mf--ok" data-val="true" onclick="onMappedFilter('true', this)">
+          <i class="fa fa-check"></i> Mapejades
+        </button>
+        <button class="vm-mf-btn vm-mf--ko" data-val="false" onclick="onMappedFilter('false', this)">
+          <i class="fa fa-times"></i> No mapejades
+        </button>
+      </div>
+
+      <!-- Search -->
+      <div class="vm-search-box">
+        <i class="fa fa-search vm-search-icon"></i>
+        <input type="text" id="varSearch" class="vm-search-input"
+               placeholder="Cercar variable..." oninput="onSearchInput(this.value)"
+               autocomplete="off">
+        <button id="clearSearch" class="vm-search-clear" onclick="clearSearch()"
+                style="display:none">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Export -->
+      <div class="vm-export-grp">
+        <div class="dropdown">
+          <button class="vm-btn dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                  aria-expanded="false" title="Opcions d'exportació">
+            <i class="fa fa-download"></i>
+            <span>Exportar</span>
+            <span class="vm-sel-badge" id="exportBadge" style="display:none">
+              (<span class="sel-count-display">0</span>)
+            </span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end vm-export-menu">
+            <li><h6 class="dropdown-header"><i class="fa fa-hospital-o"></i> El meu centre</h6></li>
+            <li>
+              <button class="dropdown-item" type="button" onclick="onExportMineAll()">
+                <i class="fa fa-table"></i> Totes les variables
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item sel-dep-btn" type="button"
+                      disabled onclick="onExportSelectionMine()">
+                <i class="fa fa-filter"></i> Variables seleccionades
+                <span class="vm-dd-count">(<span class="sel-count-display">0</span>)</span>
+              </button>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><h6 class="dropdown-header"><i class="fa fa-globe"></i> Tots els centres</h6></li>
+            <li>
+              <button class="dropdown-item sel-dep-btn" type="button"
+                      disabled onclick="onExportSelectionAll()">
+                <i class="fa fa-filter"></i> Variables seleccionades
+                <span class="vm-dd-count">(<span class="sel-count-display">0</span>)</span>
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" type="button" onclick="onExportAllAll()">
+                <i class="fa fa-table"></i> Totes les variables
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── CONTENT ──────────────────────────────────────────────────────────── -->
+<div class="vm-content">
+
+  <!-- Loading -->
+  <div id="stateLoading" class="vm-state">
+    <div class="vm-spinner"></div>
+    <p>Carregant...</p>
+  </div>
+
+  <!-- Initial: category grid -->
+  <div id="stateCats" style="display:none">
+    <p class="vm-hint">Selecciona un grup per veure les variables o utilitza el cercador.</p>
+    <div class="vm-cat-grid" id="catGrid"></div>
+  </div>
+
+  <!-- Empty -->
+  <div id="stateEmpty" class="vm-state" style="display:none">
+    <i class="fa fa-inbox vm-empty-icon"></i>
+    <p id="emptyMsg">No s'han trobat variables</p>
+  </div>
+
+  <!-- Variable list -->
+  <div id="stateList" style="display:none">
+    <div class="vm-list-hd" id="listHeader"></div>
+    <div class="vm-list" id="varsList"></div>
+  </div>
+
+</div>
+
+<!-- ── DETAIL MODAL ─────────────────────────────────────────────────────── -->
+<div class="modal fade" id="varModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content vm-modal-content">
+
+      <div class="modal-header vm-modal-header" id="modalHeader">
+        <div>
+          <div class="vm-modal-status" id="modalStatus"></div>
+          <h5 class="modal-title vm-modal-title" id="modalTitle">—</h5>
+          <div class="vm-modal-meta" id="modalMeta"></div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                aria-label="Tancar"></button>
+      </div>
+
+      <div class="modal-body vm-modal-body" id="modalBody">
+        <!-- Rendered by JS -->
+      </div>
+
+      <div class="modal-footer vm-modal-footer">
+        <a id="modalMapLink" href="#" class="btn btn-sm btn-primary"
+           style="display:none">
+          <i class="fa fa-arrow-right"></i> Anar a Mapejar
+        </a>
+        <button type="button" class="btn btn-sm btn-secondary"
+                data-bs-dismiss="modal">Tancar</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', path='js/view_maps.js') }}"></script>
+{% endblock %}

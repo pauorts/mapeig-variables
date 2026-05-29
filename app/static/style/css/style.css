@@ -1,0 +1,136 @@
+#main-content {
+    padding-top: 50px; /* Misma altura que tu navbar */
+    height: 100vh; /* Ocupa toda la altura */
+    display: flex; /* Prepara el terreno para flexbox */
+    flex-direction: column;
+    /* overflow: hidden;  */
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f6f8;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navbar {
+  background-color: #283e4a;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.navbar-toggler.custom-small {
+  padding: 0.2rem 0.4rem;
+  width: 36px;                /* más estrecho */
+  height: 36px;               /* más bajito */
+  border-width: 1px;          /* borde más fino */
+}
+
+.navbar-toggler.custom-small:focus {
+  box-shadow: 0 0 0 0.1rem rgba(0, 123, 255, 0.25); /* sombra de foco más sutil */
+}
+
+.navbar-toggler-icon {
+  width: 20px;
+}
+
+.navbar img {
+  height: 30px;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 400px;
+  background-color: #ffffff;
+  padding: 30px 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.login-container .login-title {
+  font-size: 35px;
+  margin-top: 0px;
+  margin-bottom: 20px;
+  color: #283e4a;
+  font-weight: bold;
+  user-select: none;
+  pointer-events: none;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  text-align: left;
+}
+
+.login-form label {
+  font-weight: 500;
+  color: #333333;
+  user-select: none;
+  pointer-events: none;
+}
+
+.login-form input {
+  padding: 10px 12px;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.login-form button {
+  background-color: #283e4a;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-form button:hover {
+  background-color: #507f99;
+}
+
+.error-message {
+  background-color: #fdecea; /* rojo suave */
+  color: #b00020;            /* rojo más intenso para el texto */
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 10px;
+  text-align: center;
+  font-weight: 500;
+  user-select: none;
+  pointer-events: none;
+}
+
+.btn-grey {
+  background-color: #e0e0e0;
+  color: #333;
+  border: 1px solid #ccc;
+  font-weight: 500;
+}
+
+.btn-grey:hover {
+  background-color: #d5d5d5;
+  color: #000;
+}
+
+.container-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+

@@ -1,0 +1,57 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# requirements.batch.txt — batch pipeline delta
+#
+# Installed ON TOP OF requirements.txt inside Dockerfile.batch.
+# Contains only the ML/embedding stack not present in the API image.
+#
+# Install order in Dockerfile.batch:
+#   1. pip install -r requirements.txt
+#   2. pip install -r requirements.batch.txt
+# ─────────────────────────────────────────────────────────────────────────────
+ 
+# ── Core ML stack ─────────────────────────────────────────────────────────────
+# torch: CPU-only. 2.0.1 is the last release before the 2.1 ABI break.
+# If the server gets a GPU, replace with the matching +cu118 wheel:
+# https://download.pytorch.org/whl/cu118/torch-2.0.1%2Bcu118-cp311-cp311-linux_x86_64.whl
+torch==2.0.1
+ 
+# faiss-cpu: pure-CPU ANN search, numpy 1.23.5 compatible.
+# Swap for faiss-gpu if a CUDA GPU is available.
+faiss-cpu==1.7.4
+ 
+# ── HuggingFace / Transformers stack ─────────────────────────────────────────
+sentence-transformers==2.7.0
+transformers==4.35.0
+tokenizers==0.14.1
+huggingface-hub==0.16.4
+safetensors==0.4.1
+ 
+# ── Transitive deps of transformers / huggingface-hub ────────────────────────
+# Must be pinned explicitly in a fully-pinned environment.
+filelock==3.13.1
+regex==2023.10.3
+fsspec==2023.10.0
+ 
+# ── TensorFlow ecosystem ──────────────────────────────────────────────────────
+# tensorflow 2.12 requires numpy<1.24 — numpy==1.23.5 satisfies this.
+tensorflow==2.12.0
+tensorflow-estimator==2.12.0
+tensorflow-io-gcs-filesystem==0.37.1
+keras==2.12.0
+tensorboard==2.12.3
+tensorboard-data-server==0.7.2
+ 
+# ── TensorFlow transitive deps ────────────────────────────────────────────────
+astunparse==1.6.3
+flatbuffers==25.9.23
+gast==0.4.0
+google-pasta==0.2.0
+libclang==18.1.1
+ml_dtypes==0.5.3
+opt_einsum==3.4.0
+termcolor==3.1.0
+wrapt==1.14.2
+ 
+# ── JAX (used alongside TensorFlow in research pipelines) ────────────────────
+jax==0.4.30
+jaxlib==0.4.30

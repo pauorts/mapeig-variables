@@ -1,0 +1,51 @@
+{% extends "GENERAL/base.html" %}
+
+{% block title %}Seleccionar funció{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='style/css/selection.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="sel-page">
+
+  <div class="sel-hero">
+    <div class="sel-hero-logo">
+      <i class="fa fa-medkit"></i>
+    </div>
+    <h1 class="sel-title">Eina de Mapeig UCI</h1>
+    <p class="sel-sub">Catàleg SOCMIC · Variables de referència UCI</p>
+  </div>
+
+  <div class="sel-cards">
+
+    <a href="/mapeos" class="sel-card">
+      <div class="sel-card-icon">
+        <i class="fa fa-bar-chart"></i>
+      </div>
+      <div class="sel-card-body">
+        <h3 class="sel-card-title">Cobertura de Mapeigs</h3>
+        <p class="sel-card-desc">Consulta el grau de cobertura del teu hospital respecte al catàleg de variables de referència SOCMIC-UCI. Filtra per categoria i exporta resultats.</p>
+        <div class="sel-card-cta">
+          Veure cobertura <i class="fa fa-arrow-right"></i>
+        </div>
+      </div>
+    </a>
+
+    <a href="/map_var" class="sel-card">
+      <div class="sel-card-icon sel-card-icon--tool">
+        <i class="fa fa-exchange"></i>
+      </div>
+      <div class="sel-card-body">
+        <h3 class="sel-card-title">Eina de Mapeig</h3>
+        <p class="sel-card-desc">Mapeja de forma interactiva les variables del teu hospital amb les variables de referència del catàleg SOCMIC-UCI.</p>
+        <div class="sel-card-cta">
+          Obrir eina <i class="fa fa-arrow-right"></i>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+</div>
+{% endblock %}

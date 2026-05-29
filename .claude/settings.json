@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(*.pem)",
+      "Read(*.key)",
+      "Edit(./.env)",
+      "Edit(./.env.*)",
+      "Read(./app/db_connections/*)",
+      "Edit(./app/db_connections/*)"
+    ]
+  }
+}

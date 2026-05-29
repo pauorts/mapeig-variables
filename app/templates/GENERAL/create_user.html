@@ -1,0 +1,50 @@
+{% extends "GENERAL/base.html" %}
+
+{% block title %}Crear Usuari{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+  <div class="bg-white rounded shadow-lg border p-4" style="width: 100%; max-width: 420px;">
+
+    <div class="text-center mb-4">
+      <h2 class="h4 fw-bold" style="color: #283e4a;">Afegir Nou Usuari</h2>
+      <p class="text-muted small mt-2">Enviarem una invitació a aquest correu perquè l'usuari pugui establir la seva pròpia contrasenya.</p>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger text-center py-2 small">{{ error }}</div>
+    {% endif %}
+
+    {% if success %}
+    <div class="alert alert-success text-center py-2 small">{{ success }}</div>
+    {% endif %}
+
+    <form action="/admin/create-user" method="POST" class="d-flex flex-column gap-3">
+      <div>
+        <label class="form-label fw-bold">Correu electrònic</label>
+        <input type="email" name="email" required class="form-control" placeholder="nom.cognom@hospital.cat">
+      </div>
+      <div>
+        <label class="form-label fw-bold">Nom i Cognoms</label>
+        <input type="text" name="nombre" required class="form-control" placeholder="Ex: Maria Garcia">
+      </div>
+      <div>
+        <label class="form-label fw-bold">Rol</label>
+        <select name="rol" required class="form-select">
+          <option value="" disabled selected>Selecciona un rol</option>
+          {% for r in roles %}
+            <option value="{{ r }}">{{ r|capitalize }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn w-100 fw-bold py-2 mt-2" style="background-color: #283e4a; color: white;">
+        Crear i Enviar Invitació
+      </button>
+    </form>
+
+    <div class="mt-4 text-center">
+      <a href="/select/" class="text-primary small fw-semibold">&larr; Tornar al panell</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

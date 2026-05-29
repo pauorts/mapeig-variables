@@ -1,0 +1,36 @@
+{% extends "GENERAL/base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center w-100" style="min-height: 85vh;">
+  <div class="login-container shadow-sm rounded p-4 bg-white">
+    <div class="login-header mb-4 text-center">
+      <h2 class="login-title h4 font-weight-bold text-dark">ACCÉS A EINA DE MAPEIG</h2>
+      <div class="login-divider border-bottom border-primary my-3" style="width: 50px; margin: 0 auto;"></div>
+    </div>
+  
+    <form method="POST" action="/login" class="login-form">
+      <div class="form-group mb-3">
+        <label for="email" class="font-weight-bold text-secondary">Correu</label>
+        <input type="text" id="email" name="email" class="form-control form-input" required>
+      </div>
+      
+      <div class="form-group mb-4">
+        <label for="password" class="font-weight-bold text-secondary">Contrasenya</label>
+        <input type="password" id="password" name="password" class="form-control form-input" required>
+      </div>
+
+      <div class="form-actions text-center mt-4">
+        <button type="submit" class="btn btn-primary btn-block submit-button font-weight-bold py-2 px-5">Accedir</button>
+        <a href="/forgot-password" class="d-block mt-3 text-secondary small">Has oblidat la contrasenya?</a>
+      </div>
+  
+      {% if error %}
+        <div class="error-message alert alert-danger mt-3 text-center" role="alert">
+          {{ error }}
+        </div>
+      {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock %}

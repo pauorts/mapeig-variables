@@ -1,0 +1,154 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   selection.css — Pàgina de selecció de funció
+   ════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --sel-brand:    #283e4a;
+  --sel-brand-lt: #3a5668;
+  --sel-bg:       #f1f5f9;
+  --sel-surface:  #ffffff;
+  --sel-border:   #e2e8f0;
+  --sel-text:     #1e293b;
+  --sel-muted:    #64748b;
+  --sel-radius:   14px;
+  --sel-nav-h:    55px;
+}
+
+.sel-page {
+  min-height: calc(100vh - var(--sel-nav-h));
+  background: var(--sel-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 56px 24px 80px;
+}
+
+/* ─── Hero ───────────────────────────────────────────────── */
+.sel-hero {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.sel-hero-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: var(--sel-brand);
+  color: #fff;
+  font-size: 1.7rem;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 16px rgba(40,62,74,0.22);
+}
+
+.sel-title {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--sel-brand);
+  margin: 0 0 6px;
+  letter-spacing: -0.3px;
+}
+
+.sel-sub {
+  font-size: 0.9rem;
+  color: var(--sel-muted);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* ─── Cards ──────────────────────────────────────────────── */
+.sel-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+  max-width: 760px;
+}
+
+.sel-card {
+  background: var(--sel-surface);
+  border: 1px solid var(--sel-border);
+  border-radius: var(--sel-radius);
+  padding: 28px 24px;
+  text-decoration: none;
+  color: var(--sel-text);
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.sel-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(40,62,74,0.13);
+  border-color: var(--sel-brand);
+  color: var(--sel-text);
+  text-decoration: none;
+}
+
+.sel-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--sel-brand);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sel-card-icon--tool {
+  background: var(--sel-brand-lt);
+}
+
+.sel-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sel-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--sel-text);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.sel-card-desc {
+  font-size: 0.84rem;
+  color: var(--sel-muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.sel-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--sel-brand);
+  margin-top: 4px;
+  transition: gap 0.18s;
+}
+
+.sel-card:hover .sel-card-cta {
+  gap: 10px;
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .sel-page { padding: 36px 16px 60px; }
+  .sel-cards { grid-template-columns: 1fr; }
+  .sel-title { font-size: 1.5rem; }
+  .sel-card { padding: 22px 18px; }
+}

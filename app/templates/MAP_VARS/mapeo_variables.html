@@ -1,0 +1,221 @@
+{% extends "GENERAL/base.html" %}
+
+{% block title %}Eina de Mapeig{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', path='style/css/mapeo.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="mp-page">
+
+  <!-- ── HEADER ──────────────────────────────────────────────────────────────── -->
+  <div class="mp-header">
+    <div class="mp-header-inner">
+      <a href="/select/" class="mp-back-btn" title="Tornar">
+        <i class="fa fa-arrow-left"></i>
+      </a>
+      <div>
+        <h1 class="mp-title">Eina de Mapeig</h1>
+        <p class="mp-sub">Catàleg SOCMIC · Variables UCI de referència</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BODY: two panels ────────────────────────────────────────────────────── -->
+  <div class="mp-body">
+    <div class="mp-layout">
+
+      <!-- VARIABLES REFERÈNCIA -->
+      <div class="mp-panel">
+        <button class="section-button">
+          <span>
+            <i class="fa fa-book" style="margin-right:8px;opacity:.75"></i>VARIABLES REFERÈNCIA
+          </span>
+          <span id="referenceSelectedBadge" class="selected-var-badge" style="display:none;"></span>
+        </button>
+        <div class="section-content" id="referenceSection" style="display:block">
+          <div class="mp-section-inner">
+
+            <div class="mp-filters">
+              <select id="referenceTipo" class="mp-select">
+                <option value="">Tots els grups</option>
+              </select>
+              <input type="text" id="referenceSearch" class="mp-input"
+                     placeholder="Cercar variable..."
+                     onkeyup="if(event.key==='Enter') buscarVariables('reference','NO')">
+            </div>
+
+            <div class="mp-filter-actions">
+              <button class="mp-btn-search" onclick="buscarVariables('reference','NO')">
+                <i class="fa fa-search"></i> Coincidències
+              </button>
+              <button class="mp-btn-search" onclick="buscarVariables('reference','SI')">
+                <i class="fa fa-check"></i> Exacta
+              </button>
+            </div>
+
+            <div class="table-container" id="referenceTableContainer" style="display:none;">
+              <table id="referenceTable" class="table table-sm align-middle">
+                <tbody></tbody>
+              </table>
+            </div>
+
+            <div class="mp-empty-hint" id="referenceHint">
+              <i class="fa fa-search"></i>
+              <span>Cerca per mostrar variables de referència</span>
+            </div>
+
+            <div class="mp-empty-hint mp-no-results" id="referenceNoResults" style="display:none;">
+              <i class="fa fa-exclamation-circle"></i>
+              <span>No s'han trobat coincidències</span>
+            </div>
+
+            <div class="mapear-btn-container">
+              <button id="btnLimpiarreference" class="btn-limpiar"
+                      onclick="limpiarSeleccion('reference')" style="display:none;">
+                <i class="fa fa-times"></i> Netejar selecció
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- VARIABLES HOSPITAL -->
+      <div class="mp-panel">
+        <button class="section-button">
+          <span>
+            <i class="fa fa-hospital-o" style="margin-right:8px;opacity:.75"></i>VARIABLES HOSPITAL
+          </span>
+          <span id="hospitalSelectedBadge" class="selected-var-badge" style="display:none;"></span>
+        </button>
+        <div class="section-content" id="hospitalSection" style="display:block">
+          <div class="mp-section-inner">
+
+            <div class="mp-filters">
+              <select id="hospitalTipo" class="mp-select">
+                <option value="">Totes les procedències</option>
+              </select>
+              <input type="text" id="hospitalSearch" class="mp-input"
+                     placeholder="Cercar variable..."
+                     onkeyup="if(event.key==='Enter') buscarVariables('hospital','NO')">
+            </div>
+
+            <div class="mp-filter-actions mp-filter-actions--split">
+              <select id="hospitalOrden" class="mp-select mp-select--sm"
+                      onchange="cambiarOrden('hospital',this.value,this)">
+                <option value="none">Ordenar per...</option>
+                <option value="last_value">Últim registre</option>
+                <option value="porc_pats">Major cobertura</option>
+              </select>
+              <div class="mp-btn-group">
+                <button class="mp-btn-search" onclick="buscarVariables('hospital','NO')">
+                  <i class="fa fa-search"></i> Coincidències
+                </button>
+                <button class="mp-btn-search" onclick="buscarVariables('hospital','SI')">
+                  <i class="fa fa-check"></i> Exacta
+                </button>
+              </div>
+            </div>
+
+            <div class="table-container" id="hospitalTableContainer" style="display:none;">
+              <table id="hospitalTable" class="table table-sm align-middle">
+                <tbody></tbody>
+              </table>
+            </div>
+
+            <div class="mp-empty-hint" id="hospitalHint">
+              <i class="fa fa-search"></i>
+              <span>Cerca per mostrar variables del centre</span>
+            </div>
+
+            <div class="mp-empty-hint mp-no-results" id="hospitalNoResults" style="display:none;">
+              <i class="fa fa-exclamation-circle"></i>
+              <span>No s'han trobat coincidències</span>
+            </div>
+
+            <div class="mapear-btn-container">
+              <button id="btnLimpiarHospital" class="btn-limpiar"
+                      onclick="limpiarSeleccion('hospital')" style="display:none;">
+                <i class="fa fa-times"></i> Netejar selecció
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /mp-layout -->
+  </div><!-- /mp-body -->
+
+  <!-- ── FOOTER: map button ──────────────────────────────────────────────────── -->
+  <div class="mp-footer">
+    <button id="btnMapearFinal" class="btnMapearFinal" onclick="realizarMapeo()" disabled>
+      <i class="fa fa-link"></i> Mapejar variables
+    </button>
+  </div>
+
+</div><!-- /mp-page -->
+
+<!-- ── CONFIRMATION MODAL ───────────────────────────────────────────────────── -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content mp-modal-content">
+      <div class="modal-header mp-modal-hd">
+        <h5 class="modal-title" id="confirmModalTitle">Confirmar acció</h5>
+        <button type="button" class="btn-close mp-btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="confirmModalBody">
+        Estàs segur de realitzar aquesta acció?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel·lar</button>
+        <button type="button" class="btn btn-sm btn-primary" id="confirmModalBtn">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DETAIL MODAL ─────────────────────────────────────────────────────────── -->
+<div class="modal fade" id="detallesModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content mp-modal-content">
+      <div class="modal-header mp-modal-hd">
+        <h5 class="modal-title" id="modalLabel">Detalls de la Variable</h5>
+        <button type="button" class="btn-select-modal" id="btnSelectFromModal"
+                onclick="clickSeleccionarDesdeModal()">Carregant...</button>
+        <button type="button" class="btn-close mp-btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body mp-modal-body">
+        <ul id="modalDetallesContent" class="mp-detail-list"></ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-prev" id="btnPrevVar" onclick="navegarModal(-1)">
+          <i class="fa fa-chevron-left"></i> Anterior
+        </button>
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Tancar</button>
+        <button type="button" class="btn-next" id="btnNextVar" onclick="navegarModal(1)">
+          Següent <i class="fa fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOASTS ────────────────────────────────────────────────────────────────── -->
+<div class="toast-container">
+  <div id="toastNotification" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto" id="toastTitle">Notificació</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+    </div>
+    <div class="toast-body" id="toastBody">Missatge</div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', path='js/mapeo.js') }}"></script>
+{% endblock %}

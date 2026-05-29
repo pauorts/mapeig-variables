@@ -1,0 +1,2 @@
+# 0 3 * * * root cd /app && /usr/local/bin/python -m app.cron.update_core >> /var/log/cron.log 2>&1
+0 3 * * 0 root cd /app && /usr/local/bin/python -m app.cron.update_metrics >> /var/log/cron.log 2>&1
