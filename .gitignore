@@ -164,6 +164,9 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+# Embedding cache (binary, large, regenerable)
+embedding_cache/
+
 # files with data except requirements
 
 *.csv
@@ -193,6 +196,8 @@ backup_data_only.sql
 LICENCIA SNOMED CT.pdf
 
 supabase
+
+IRBD_Multibase_PostgreSQL_full/
 
 __pycache__/
 

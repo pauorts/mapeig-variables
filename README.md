@@ -178,3 +178,20 @@ docker-compose down -v
                     │  perfil: tools   │
                     └──────────────────┘
 ```
+
+##### REPO GITHUB #######
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/pauorts/mapeig-variables.git
+git branch -M main
+git push -u origin main
+
+##### DESPLEGAMENT AL SERVER ######
+mkdir eina-mapeig
+git clone https://github.com/pauorts/mapeig-variables.git ///// git pull origin
+scp -r IRBD_Multibase_PostgreSQL_full usuario@ip-servidor::eina-mapeig/mapeig-variables
+scp -r app/embedding_cache usuario@ip-servidor::eina-mapeig/mapeig-variables
+scp .env usuario@ip-servidor::eina-mapeig/mapeig-variables
+
+--> mateixos pasos per desplegar docker + executar comandes

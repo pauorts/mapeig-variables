@@ -6,6 +6,7 @@ Seed inicial de la base de datos:
 Las tablas las crea Alembic (alembic upgrade head) antes de llamar a este script.
 """
 import logging
+import os
 
 from sqlalchemy import text
 
@@ -46,7 +47,7 @@ _HOSPITALES = [
 ]
 
 # Un admin por hospital con password temporal "Admin123!" (debe cambiarse)
-_DEFAULT_ADMIN_PASSWORD = "Admin123!"
+_DEFAULT_ADMIN_PASSWORD = os.environ["_DEFAULT_ADMIN_PASSWORD"]
 
 _SUPERADMIN = {
     "username": "superadmin",
@@ -54,7 +55,7 @@ _SUPERADMIN = {
     # hospital_id és obligatori al model; el superadmin bypassa el filtre per rol="superadmin"
     "hospital_acronim": "JX",
 }
-_DEFAULT_SUPERADMIN_PASSWORD = "Superadmin123!"
+_DEFAULT_SUPERADMIN_PASSWORD = os.environ["_DEFAULT_SUPERADMIN_PASSWORD"]
 
 
 # ─── Función principal ────────────────────────────────────────────────────────

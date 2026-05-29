@@ -17,16 +17,16 @@ exit_with_error() {
 
 # Validar que el contenidor està en execució
 echo -e "\e[33mVerificant contenidor $CONTAINER_NAME...\e[0m"
-docker ps | grep -q "$CONTAINER_NAME" || exit_with_error "Contenidor $CONTAINER_NAME no està en execució. Executa: docker-compose up -d"
+sudo docker ps | grep -q "$CONTAINER_NAME" || exit_with_error "Contenidor $CONTAINER_NAME no està en execució. Executa: docker-compose up -d"
 
 # Validar que el fitxer SQL existeix
 [ -f "$SQL_FILE" ] || exit_with_error "Fitxer $SQL_FILE no trobat"
 
 # ====== PAS 0: Netejar BD existent si existeix ======
 echo -e "\e[33mPas 0: Verificant si existeix BD anterior...\e[0m"
-if docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d postgres -lqt | grep -q "$DB_NAME"; then
+if sudo docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d postgres -lqt | grep -q "$DB_NAME"; then
     echo -e "\e[33mBD $DB_NAME ja existeix. Eliminant...\e[0m"
-    if docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d postgres -c "DROP DATABASE IF EXISTS $DB_NAME;" 2>/dev/null; then
+    if sudo docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d postgres -c "DROP DATABASE IF EXISTS $DB_NAME;" 2>/dev/null; then
         echo -e "\e[32mBD anterior eliminada\e[0m"
     else
         echo -e "\e[33mNo s'ha pogut eliminar la BD anterior (continuant...)\e[0m"
@@ -36,18 +36,18 @@ fi
 
 # ====== PAS 1: Crear BD ======
 echo -e "\e[36mPas 1: Creant base de dades $DB_NAME...\e[0m"
-docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d postgres -c "CREATE DATABASE $DB_NAME;" 2>/dev/null \
+sudo docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d postgres -c "CREATE DATABASE $DB_NAME;" 2>/dev/null \
     || echo -e "\e[33mBD ja existeix o error (continuant...)\e[0m"
 
 # ====== PAS 2: Copiar SQL ======
 echo -e "\e[36mPas 2: Copiant volcament SQL al contenidor...\e[0m"
-docker cp "$SQL_FILE" "$CONTAINER_NAME:/tmp/volcado.sql" \
+sudo docker cp "$SQL_FILE" "$CONTAINER_NAME:/tmp/volcado.sql" \
     || exit_with_error "Error en copiar el fitxer SQL"
 
 # ====== PAS 3: Restaurar dades ======
 echo -e "\e[36mPas 3: Restaurant dades (això pot trigar 5-15 minuts)...\e[0m"
 restore_start=$(date +%s)
-docker exec -i "$CONTAINER_NAME" pg_restore -U "$DB_USER" -d "$DB_NAME" -O /tmp/volcado.sql \
+sudo docker exec -i "$CONTAINER_NAME" pg_restore -U "$DB_USER" -d "$DB_NAME" -O /tmp/volcado.sql \
     || exit_with_error "Error en restaurar la base de dades"
 restore_end=$(date +%s)
 restore_time=$((restore_end - restore_start))
@@ -61,7 +61,7 @@ echo -e "\e[32mTaules trobades: $table_count\e[0m"
 
 # Verificar accés a taula específica
 echo -e "\e[33mVerificant permisos a la taula snomedct_irbd_full.glsd_description...\e[0m"
-docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d "$DB_NAME" \
+sudo docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d "$DB_NAME" \
     -c "SELECT COUNT(*) FROM snomedct_irbd_full.glsd_description LIMIT 1;" 2>&1
 echo -e "\e[32mAccés verificat\e[0m"
 
@@ -75,7 +75,7 @@ echo ""
 # ====== PAS 4: Executar procés batch ======
 echo -e "\e[36mPas 4: Executant procés batch...\e[0m"
 batch_start=$(date +%s)
-docker-compose --profile tools run --rm process-reference \
+sudo docker compose --profile tools run --rm process-reference \
     || exit_with_error "Error en el procés batch"
 batch_end=$(date +%s)
 batch_time=$((batch_end - batch_start))
@@ -90,11 +90,11 @@ ls -lh ./metrics_output/ 2>/dev/null || true
 echo -e "\e[33mPas 5: Iniciant neteja...\e[0m"
 
 echo -e "\e[36mEliminant base de dades $DB_NAME...\e[0m"
-docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d postgres -c "DROP DATABASE $DB_NAME;" \
+sudo docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d postgres -c "DROP DATABASE $DB_NAME;" \
     || echo -e "\e[33mError en eliminar la BD (continuant...)\e[0m"
 
 echo -e "\e[36mEliminant imatge Docker...\e[0m"
-if docker rmi eina-mapeig-process-reference 2>/dev/null; then
+if sudo docker rmi eina-mapeig-process-reference 2>/dev/null; then
     echo -e "\e[32mImatge eliminada\e[0m"
 else
     echo -e "\e[33mImatge no trobada (ignorant)\e[0m"
