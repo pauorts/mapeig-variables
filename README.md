@@ -191,7 +191,8 @@ git push -u origin main
 mkdir eina-mapeig
 git clone https://github.com/pauorts/mapeig-variables.git ///// git pull origin
 scp -r IRBD_Multibase_PostgreSQL_full usuario@ip-servidor::eina-mapeig/mapeig-variables
-scp -r app/embedding_cache usuario@ip-servidor::eina-mapeig/mapeig-variables
+scp -r app/embedding_cache usuario@ip-servidor::eina-mapeig/mapeig-variables/app
 scp .env usuario@ip-servidor::eina-mapeig/mapeig-variables
+scp -r SOCMIC_FOLDER usuario@ip-servidor::eina-mapeig/mapeig-variables
 
 --> mateixos pasos per desplegar docker + executar comandes

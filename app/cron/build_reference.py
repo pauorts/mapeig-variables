@@ -33,7 +33,7 @@ engine_snomed  = create_engine(conexion_url)
 NODO_RAIZ = '138875005'
 
 # ── Embedding cache — _v3 (model changed, recompute on first run) ───────────
-EMB_CACHE_DIR      = os.getenv("EMB_CACHE_DIR", "app/embedding_cache")
+EMB_CACHE_DIR      = os.getenv("EMB_CACHE_DIR", "/app/app/embedding_cache")
 SNOMED_EMB_CACHE   = os.path.join(EMB_CACHE_DIR, "snomed_emb.npy")
 SNOMED_META_CACHE  = os.path.join(EMB_CACHE_DIR, "snomed_meta.pkl")
 OPENEHR_EMB_CACHE  = os.path.join(EMB_CACHE_DIR, "openehr_emb.npy")
