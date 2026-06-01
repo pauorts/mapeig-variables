@@ -3,9 +3,11 @@ let selectedCategoria = null;
 let selectedHospitales = [];
 
 // Handles 'Categorica' and 'Categòrica' (DB stores either form)
+// Maneja 'Categorica', 'Categòrica' y 'Categórica' (en mayúsculas o minúsculas)
 function isCategorica(tipo) {
   if (!tipo) return false;
-  return tipo.replace(/ó/g, 'o').toLowerCase().trim() === 'categorica';
+  // Pasamos a minúsculas primero, luego reemplazamos ó/ò por o, quitamos espacios y comparamos
+  return tipo.toLowerCase().replace(/[òó]/g, 'o').trim() === 'categorica';
 }
 
 // Estado de ordenación por sección

@@ -192,6 +192,7 @@ mkdir eina-mapeig
 git clone https://github.com/pauorts/mapeig-variables.git ///// git pull origin
 scp -r IRBD_Multibase_PostgreSQL_full usuario@ip-servidor::eina-mapeig/mapeig-variables
 scp -r app/embedding_cache usuario@ip-servidor::eina-mapeig/mapeig-variables/app
+scp archetypes_2026_01_29-15_34_10.zip usuario@ip-servidor::eina-mapeig/mapeig-variables
 scp .env usuario@ip-servidor::eina-mapeig/mapeig-variables
 scp -r SOCMIC_FOLDER usuario@ip-servidor::eina-mapeig/mapeig-variables
 

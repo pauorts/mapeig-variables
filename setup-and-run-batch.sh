@@ -49,20 +49,11 @@ sudo docker cp "$SQL_FILE" "$CONTAINER_NAME:/tmp/volcado.sql" \
 # ====== PAS 3: Restaurar dades ======
 echo -e "\e[36mPas 3: Restaurant dades (això pot trigar 5-15 minuts)...\e[0m"
 
-# Reduïm maintenance_work_mem per evitar que PostgreSQL mori per OOM
-# durant la creació d'índexs en taules grans de SNOMED
-echo -e "\e[33mAjustant maintenance_work_mem per al restore...\e[0m"
-sudo docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d postgres \
-    -c "ALTER SYSTEM SET maintenance_work_mem = '32MB'; SELECT pg_reload_conf();" \
-    || echo -e "\e[33mNo s'ha pogut ajustar maintenance_work_mem (continuant...)\e[0m"
-
 restore_start=$(date +%s)
 sudo docker exec -i "$CONTAINER_NAME" pg_restore -U "$DB_USER" -d "$DB_NAME" -O /tmp/volcado.sql \
     || exit_with_error "Error en restaurar la base de dades"
 
-# Restaurar configuració per defecte
-sudo docker exec -i "$CONTAINER_NAME" psql -U "$DB_USER" -d postgres \
-    -c "ALTER SYSTEM RESET maintenance_work_mem; SELECT pg_reload_conf();" 2>/dev/null || true
+
 restore_end=$(date +%s)
 restore_time=$((restore_end - restore_start))
 echo -e "\e[32mRestauració completada en ${restore_time}s\e[0m"
